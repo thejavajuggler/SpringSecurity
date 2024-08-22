@@ -1,7 +1,7 @@
 package com.security.authentication.controllers;
 
 import com.security.authentication.dto.AuthenticationResponse;
-import com.security.authentication.entities.Users;
+import com.security.authentication.entities.User;
 import com.security.authentication.services.UserService;
 import jakarta.annotation.security.RolesAllowed;
 import lombok.NonNull;
@@ -20,24 +20,24 @@ public class UserControlller {
     private UserService userService;
 
     @PostMapping("/register")
-    public ResponseEntity<AuthenticationResponse> addUser(@NonNull @RequestBody Users users) {
-        AuthenticationResponse authenticationResponse =  userService.registerUser(users);
+    public ResponseEntity<AuthenticationResponse> addUser(@NonNull @RequestBody User user) {
+        AuthenticationResponse authenticationResponse =  userService.registerUser(user);
         return ResponseEntity.ok(authenticationResponse);
     }
 
     @PostMapping("/authenticate")
-    public ResponseEntity<AuthenticationResponse> authenticateUsers(@NonNull @RequestBody Users users) {
-        AuthenticationResponse authenticationResponse =  userService.authenticateUser(users);
+    public ResponseEntity<AuthenticationResponse> authenticateUsers(@NonNull @RequestBody User user) {
+        AuthenticationResponse authenticationResponse =  userService.authenticateUser(user);
         return ResponseEntity.ok(authenticationResponse);
     }
 
-    @RolesAllowed({"ADMIN"})
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping("/admin")
     public String adminEndpoint() {
         return "This is the admin endpoint. Only users with the ADMIN role can access this.";
     }
 
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasAuthority('READ_PRIVILEGES')")
     @GetMapping("/user")
     public String userEndpoint() {
         return "This is the user endpoint. Users with ADMIN or MEMBER roles can access this.";

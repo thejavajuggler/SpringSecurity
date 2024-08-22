@@ -2,5 +2,5 @@ package com.security.authentication.enums;
 
 public enum Role {
 
-    ADMIN, MEMBER
+    ROLE_USER, ROLE_ADMIN, ROLE_SUPPORT
 }

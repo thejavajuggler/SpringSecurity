@@ -1,6 +1,6 @@
 package com.security.authentication.config;
 
-import com.security.authentication.entities.Users;
+import com.security.authentication.entities.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -14,8 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.security.Key;
 import java.util.*;
-
-import static javax.crypto.Cipher.SECRET_KEY;
+import java.util.stream.Collectors;
 
 @Service
 public class JwtUtil {
@@ -23,10 +22,14 @@ public class JwtUtil {
     @Value("${spring.security.secret.key}")
     private String SECRET;
 
-    public String generateToken(Users users) {
+    public String generateToken(User user) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("authorities", populateAuthorities(users.getAuthorities()));
-        return createToken(users.getEmail(), claims);
+        claims.put("roles", user.getRoles().stream().map(role -> role.getName()).collect(Collectors.toList()));
+        claims.put("permissions", user.getRoles().stream()
+                .flatMap(role -> role.getPermissions().stream())
+                .map(permission -> permission.getName().name())
+                .collect(Collectors.toList()));
+        return createToken(user.getEmail(), claims);
     }
 
     private String populateAuthorities(Collection<? extends GrantedAuthority> grantedAuthorities) {
